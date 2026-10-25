@@ -17,6 +17,14 @@ def check_columns(path):
         header = next(csv.reader(f), [])
     return [c for c in REQUIRED_COLUMNS if c not in header]
 
+def find_duplicates(path):
+    """Return invoice numbers that appear more than once."""
+    seen = {}
+    with open(path, newline="") as f:
+        for row in csv.DictReader(f):
+            num = row.get("INVOICE_NUM", "")
+            seen[num] = seen.get(num, 0) + 1
+    return [n for n, count in sorted(seen.items()) if count > 1]
 
 def main():
     if len(sys.argv) != 2:
