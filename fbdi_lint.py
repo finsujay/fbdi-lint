@@ -34,6 +34,11 @@ def main():
     if missing:
         print("MISSING COLUMNS: " + ", ".join(missing))
         return 1
+    duplicates = find_duplicates(sys.argv[1])
+    if duplicates:
+        print("DUPLICATE INVOICE NUMBERS: " + ", ".join(duplicates))
+        return 1
+
     print("OK: all required columns present")
     return 0
 
