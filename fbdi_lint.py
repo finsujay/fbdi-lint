@@ -70,7 +70,7 @@ def main():
         print("BAD DATES on rows: " + ", ".join(bad_dates))
         return 1
 
-    print("OK: all required columns present")
+    print("OK: all checks passed")
     return 0
 
 
