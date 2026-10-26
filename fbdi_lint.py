@@ -9,8 +9,18 @@ REQUIRED_COLUMNS = [
     "INVOICE_DATE",
     "INVOICE_CURRENCY",
     "INVOICE_TYPE",
+    "LEGAL_ENTITY",
 ]
 
+def check_dates(path):
+    """Return row numbers whose INVOICE_DATE is not in YYYY-MM-DD form."""
+    bad = []
+    with open(path, newline="") as f:
+        for i, row in enumerate(csv.DictReader(f), start=2):
+            parts = row.get("INVOICE_DATE", "").split("-")
+            if len(parts) != 3 or len(parts[0]) != 4:
+                bad.append(str(i))
+    return bad
 
 def check_columns(path):
     """Return the required columns missing from the CSV header."""
@@ -54,6 +64,10 @@ def main():
     bad_amounts = check_amounts(sys.argv[1])
     if bad_amounts:
         print("BAD AMOUNTS on rows: " + ", ".join(bad_amounts))
+        return 1
+    bad_dates = check_dates(sys.argv[1])
+    if bad_dates:
+        print("BAD DATES on rows: " + ", ".join(bad_dates))
         return 1
 
     print("OK: all required columns present")
