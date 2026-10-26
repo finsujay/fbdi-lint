@@ -8,6 +8,7 @@ REQUIRED_COLUMNS = [
     "INVOICE_AMOUNT",
     "INVOICE_DATE",
     "INVOICE_CURRENCY",
+    "INVOICE_TYPE",
 ]
 
 
@@ -26,6 +27,18 @@ def find_duplicates(path):
             seen[num] = seen.get(num, 0) + 1
     return [n for n, count in sorted(seen.items()) if count > 1]
 
+def check_amounts(path):
+    """Return row numbers whose INVOICE_AMOUNT is not a positive number."""
+    bad = []
+    with open(path, newline="") as f:
+        for i, row in enumerate(csv.DictReader(f), start=2):
+            try:
+                if float(row.get("INVOICE_AMOUNT", "")) <= 0:
+                    bad.append(str(i))
+            except ValueError:
+                bad.append(str(i))
+    return bad
+
 def main():
     if len(sys.argv) != 2:
         print("usage: python fbdi_lint.py <invoices.csv>")
@@ -37,6 +50,10 @@ def main():
     duplicates = find_duplicates(sys.argv[1])
     if duplicates:
         print("DUPLICATE INVOICE NUMBERS: " + ", ".join(duplicates))
+        return 1
+    bad_amounts = check_amounts(sys.argv[1])
+    if bad_amounts:
+        print("BAD AMOUNTS on rows: " + ", ".join(bad_amounts))
         return 1
 
     print("OK: all required columns present")
